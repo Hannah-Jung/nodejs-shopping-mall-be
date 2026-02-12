@@ -16,13 +16,11 @@ userController.createUser = async (req, res) => {
         .status(400)
         .json({ status: "fail", error: "Invalid email format" });
     }
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({
-          status: "fail",
-          error: "Password must be at least 6 characters",
-        });
+    if (password.length < 3) {
+      return res.status(400).json({
+        status: "fail",
+        error: "Password must be at least 3 characters",
+      });
     }
     const user = await User.findOne({ email });
     if (user) {
@@ -38,7 +36,7 @@ userController.createUser = async (req, res) => {
     await newUser.save();
     return res.status(200).json({ status: "success", data: newUser.toJSON() });
   } catch (error) {
-    res.status(400).json({ status: "fail", error: error.message });
+    res.status(400).json({ status: "fail", error: message });
   }
 };
 
