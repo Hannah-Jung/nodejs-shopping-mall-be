@@ -24,7 +24,7 @@ userController.createUser = async (req, res) => {
     }
     const user = await User.findOne({ email });
     if (user) {
-      throw new Error("Email already exists...");
+      throw new Error("Email already exists");
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
