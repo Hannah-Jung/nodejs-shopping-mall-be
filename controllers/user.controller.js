@@ -1,11 +1,16 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-
 const userController = {};
+
 userController.createUser = async (req, res) => {
   try {
-    const { email, password, name, level } = req.body;
-    if (!email || !password || !name) {
+    const email = req.body.email?.trim?.() ?? "";
+    const password = req.body.password ?? "";
+    const firstName = req.body.firstName?.trim?.() ?? "";
+    const lastName = req.body.lastName?.trim?.() ?? "";
+    const level = req.body.level;
+
+    if (!email || !password || !firstName || !lastName) {
       return res
         .status(400)
         .json({ status: "fail", error: "All fields are required" });
@@ -30,13 +35,14 @@ userController.createUser = async (req, res) => {
     const newUser = new User({
       email,
       password: hashedPassword,
-      name,
-      level: level || "customer",
+      firstName,
+      lastName,
+      level: level ? level.trim() || "customer" : "customer",
     });
     await newUser.save();
     return res.status(200).json({ status: "success", data: newUser.toJSON() });
   } catch (error) {
-    res.status(400).json({ status: "fail", error: message });
+    res.status(400).json({ status: "fail", error: error.message });
   }
 };
 
