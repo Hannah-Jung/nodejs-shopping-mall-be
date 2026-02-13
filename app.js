@@ -10,7 +10,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/api", indexRouter);
 
-const mongoURI = process.env.LOCAL_DB_ADDRESS;
+const MONGODB_URI_PROD = process.env.MONGODB_URI_PROD;
+const mongoURI = MONGODB_URI_PROD;
 mongoose
   .connect(mongoURI)
   .then(() => console.log("MongoDB connected successfully"))
