@@ -15,11 +15,7 @@ const productSchema = Schema(
   { timestamps: true },
 );
 productSchema.methods.toJSON = function () {
-<<<<<<< HEAD
   const obj = this.toObject();
-=======
-  const obj = this._doc;
->>>>>>> 723fd500667b22260cc7860df6216b80c4249e1f
   delete obj.__v;
   delete obj.updatedAt;
   return obj;
