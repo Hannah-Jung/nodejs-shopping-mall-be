@@ -2,6 +2,46 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const userController = {};
 
+userController.checkEmail = async (req, res) => {
+  try {
+    const email = (req.query.email ?? "").toString().trim();
+    if (!email) {
+      return res
+        .status(400)
+        .json({
+          status: "fail",
+          available: false,
+          message: "Email is required",
+        });
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res
+        .status(400)
+        .json({
+          status: "fail",
+          available: false,
+          message: "Invalid email format",
+        });
+    }
+    const user = await User.findOne({ email });
+    if (user) {
+      return res
+        .status(200)
+        .json({
+          status: "success",
+          available: false,
+          message: "This email is already registered",
+        });
+    }
+    return res.status(200).json({ status: "success", available: true });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: "fail", available: false, error: error.message });
+  }
+};
+
 userController.createUser = async (req, res) => {
   try {
     const email = req.body.email?.trim?.() ?? "";
