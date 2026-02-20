@@ -38,17 +38,18 @@ productController.getProductList = async (req, res) => {
       ? { name: { $regex: name, $options: "i" }, isDeleted: false }
       : { isDeleted: false };
 
-    let query = Product.find(condition);
+    let query = Product.find(condition).sort({ createdAt: -1 });
     let response = { status: "success" };
 
     if (page) {
       const PAGE_SIZE = 5;
-      const totalItemNum = await Product.find(condition).countDocuments();
+      const totalItemNum = await Product.countDocuments(condition);
       const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
 
       query = query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
 
       response.totalPageNum = totalPageNum;
+      response.totalCount = totalItemNum;
     }
 
     const productList = await query.exec();

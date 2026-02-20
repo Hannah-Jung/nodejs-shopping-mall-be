@@ -9,7 +9,7 @@ const userSchema = Schema(
     password: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    level: { type: String, default: "customer" }, // 2 types: customer and admin
+    role: { type: String, default: "customer" }, // 2 types: customer and admin
   },
   { timestamps: true },
 );

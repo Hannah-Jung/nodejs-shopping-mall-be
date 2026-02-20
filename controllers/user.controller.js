@@ -6,33 +6,27 @@ userController.checkEmail = async (req, res) => {
   try {
     const email = (req.query.email ?? "").toString().trim();
     if (!email) {
-      return res
-        .status(400)
-        .json({
-          status: "fail",
-          available: false,
-          message: "Email is required",
-        });
+      return res.status(400).json({
+        status: "fail",
+        available: false,
+        message: "Email is required",
+      });
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res
-        .status(400)
-        .json({
-          status: "fail",
-          available: false,
-          message: "Invalid email format",
-        });
+      return res.status(400).json({
+        status: "fail",
+        available: false,
+        message: "Invalid email format",
+      });
     }
     const user = await User.findOne({ email });
     if (user) {
-      return res
-        .status(200)
-        .json({
-          status: "success",
-          available: false,
-          message: "This email is already registered",
-        });
+      return res.status(200).json({
+        status: "success",
+        available: false,
+        message: "This email is already registered",
+      });
     }
     return res.status(200).json({ status: "success", available: true });
   } catch (error) {
@@ -48,7 +42,7 @@ userController.createUser = async (req, res) => {
     const password = req.body.password ?? "";
     const firstName = req.body.firstName?.trim?.() ?? "";
     const lastName = req.body.lastName?.trim?.() ?? "";
-    const level = req.body.level;
+    const role = req.body.role;
 
     if (!email || !password || !firstName || !lastName) {
       return res
@@ -77,7 +71,7 @@ userController.createUser = async (req, res) => {
       password: hashedPassword,
       firstName,
       lastName,
-      level: level ? level.trim() || "customer" : "customer",
+      role: role ? role.trim() || "customer" : "customer",
     });
     await newUser.save();
     return res.status(200).json({ status: "success", data: newUser.toJSON() });
