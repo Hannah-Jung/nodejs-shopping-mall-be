@@ -33,7 +33,7 @@ productController.createProduct = async (req, res) => {
 };
 productController.getProductList = async (req, res) => {
   try {
-    const { page, name } = req.query;
+    const { page, name, limit } = req.query;
     const condition = name
       ? { name: { $regex: name, $options: "i" }, isDeleted: false }
       : { isDeleted: false };
@@ -42,7 +42,7 @@ productController.getProductList = async (req, res) => {
     let response = { status: "success" };
 
     if (page) {
-      const PAGE_SIZE = 5;
+      const PAGE_SIZE = parseInt(limit) || 9;
       const totalItemNum = await Product.countDocuments(condition);
       const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
 
