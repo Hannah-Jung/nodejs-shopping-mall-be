@@ -61,4 +61,56 @@ productController.getProductList = async (req, res) => {
   }
 };
 
+productController.getProductById = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    if (!product) throw new Error("Product not found");
+    res.status(200).json({ status: "success", data: product });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+};
+
+productController.updateProduct = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const {
+      sku,
+      name,
+      size,
+      image,
+      price,
+      description,
+      category,
+      stock,
+      status,
+    } = req.body;
+    const product = await Product.findByIdAndUpdate(
+      { _id: productId },
+      { sku, name, size, image, price, description, category, stock, status },
+      { new: true },
+    );
+    if (!product) throw new Error("Product not found");
+    res.status(200).json({ status: "success", data: product });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+};
+
+productController.deleteProduct = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findByIdAndUpdate(
+      { _id: productId },
+      { isDeleted: true },
+      { new: true },
+    );
+    if (!product) throw new Error("Product not found");
+    res.status(200).json({ status: "success", data: product });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+};
+
 module.exports = productController;
