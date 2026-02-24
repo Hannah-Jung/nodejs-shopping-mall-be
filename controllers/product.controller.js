@@ -14,11 +14,12 @@ productController.createProduct = async (req, res) => {
       stock,
       status,
     } = req.body;
+    const finalImages = Array.isArray(image) ? image : [image];
     const product = new Product({
       sku,
       name,
       size,
-      image,
+      image: finalImages,
       category,
       description,
       price,
@@ -86,9 +87,20 @@ productController.updateProduct = async (req, res) => {
       stock,
       status,
     } = req.body;
+    const finalImage = Array.isArray(image) ? image : [image];
     const product = await Product.findByIdAndUpdate(
       { _id: productId },
-      { sku, name, size, image, price, description, category, stock, status },
+      {
+        sku,
+        name,
+        size,
+        image: finalImage,
+        price,
+        description,
+        category,
+        stock,
+        status,
+      },
       { new: true },
     );
     if (!product) throw new Error("Product not found");
