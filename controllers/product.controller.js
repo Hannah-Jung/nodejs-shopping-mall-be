@@ -34,10 +34,16 @@ productController.createProduct = async (req, res) => {
 };
 productController.getProductList = async (req, res) => {
   try {
-    const { page, name, limit } = req.query;
-    const condition = name
-      ? { name: { $regex: name, $options: "i" }, isDeleted: false }
-      : { isDeleted: false };
+    const { page, name, limit, admin } = req.query;
+    const condition = { isDeleted: false };
+
+    if (admin !== "true") {
+      condition.status = "active";
+    }
+
+    if (name) {
+      condition.name = { $regex: name, $options: "i" };
+    }
 
     let query = Product.find(condition).sort({ createdAt: -1 });
     let response = { status: "success" };
@@ -123,6 +129,38 @@ productController.deleteProduct = async (req, res) => {
   } catch (error) {
     res.status(400).json({ status: "fail", error: error.message });
   }
+};
+
+productController.checkStock = async (item) => {
+  const product = await Product.findById(item.productId);
+  if (product.stock[item.size] < item.qty) {
+    return {
+      isVerify: false,
+      message: `The ${item.size} of ${product.name} is low on stock`,
+    };
+  }
+  const newStock = { ...product.stock };
+  newStock[item.size] -= item.qty;
+  product.stock = newStock;
+
+  await product.save();
+  return { isVerify: true };
+};
+
+productController.checkItemListStock = async (itemList) => {
+  const insufficientStockItems = [];
+
+  await Promise.all(
+    itemList.map(async (item) => {
+      const stockCheck = await productController.checkStock(item);
+      if (!stockCheck.isVerify) {
+        insufficientStockItems.push({ item, message: stockCheck.message });
+      }
+      return stockCheck;
+    }),
+  );
+
+  return insufficientStockItems;
 };
 
 module.exports = productController;
