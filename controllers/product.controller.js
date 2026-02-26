@@ -133,32 +133,44 @@ productController.deleteProduct = async (req, res) => {
 
 productController.checkStock = async (item) => {
   const product = await Product.findById(item.productId);
-  if (product.stock[item.size] < item.qty) {
+  if (!product) throw new Error("Product not found");
+  const actualStock = product.stock[item.size];
+
+  if (actualStock < item.qty) {
     return {
       isVerify: false,
-      message: `The ${item.size} of ${product.name} is low on stock`,
+      productId: product._id,
+      productName: product.name,
+      image: product.image[0],
+      size: item.size,
+      actualStock: actualStock,
+      message: actualStock === 0 ? "OUT OF STOCK" : "LOW ON STOCK",
     };
   }
-  const newStock = { ...product.stock };
-  newStock[item.size] -= item.qty;
-  product.stock = newStock;
 
-  await product.save();
   return { isVerify: true };
+};
+
+productController.reduceStock = async (itemList) => {
+  for (const item of itemList) {
+    const product = await Product.findById(item.productId);
+    const newStock = { ...product.stock };
+    newStock[item.size] -= item.qty;
+    product.stock = newStock;
+
+    product.markModified("stock");
+    await product.save();
+  }
 };
 
 productController.checkItemListStock = async (itemList) => {
   const insufficientStockItems = [];
-
-  await Promise.all(
-    itemList.map(async (item) => {
-      const stockCheck = await productController.checkStock(item);
-      if (!stockCheck.isVerify) {
-        insufficientStockItems.push({ item, message: stockCheck.message });
-      }
-      return stockCheck;
-    }),
-  );
+  for (const item of itemList) {
+    const stockCheck = await productController.checkStock(item);
+    if (!stockCheck.isVerify) {
+      insufficientStockItems.push(stockCheck);
+    }
+  }
 
   return insufficientStockItems;
 };

@@ -9,16 +9,17 @@ orderController.createOrder = async (req, res) => {
   try {
     const { userId } = req;
     const { totalPrice, shipTo, contact, items } = req.body;
+    const invalidItems = await productController.checkItemListStock(items);
 
-    const insufficientStockItems =
-      await productController.checkItemListStock(items);
-    if (insufficientStockItems.length > 0) {
-      const errorMessage = insufficientStockItems.reduce(
-        (total, item) => (total += item.message),
-        "",
-      );
-      throw new Error(errorMessage);
+    if (invalidItems.length > 0) {
+      return res.status(400).json({
+        status: "fail",
+        errorType: "INSUFFICIENT_STOCK",
+        invalidItems: invalidItems,
+      });
     }
+
+    await productController.reduceStock(items);
 
     const newOrder = new Order({
       userId,
