@@ -5,7 +5,7 @@ const Cart = require("./Cart");
 const orderSchema = Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    status: { type: String, default: "preparing" },
+    status: { type: String, default: "prepared" },
     totalPrice: {
       type: Number,
       required: true,
