@@ -9,7 +9,18 @@ const userSchema = Schema(
     password: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    role: { type: String, default: "customer" }, // 2 types: customer and admin
+    role: { type: String, default: "customer" },
+    contact: { type: String, default: "" },
+    address: { type: String, default: "" },
+    addressLine2: { type: String, default: "" },
+    city: { type: String, default: "" },
+    state: { type: String, default: "" },
+    zip: { type: String, default: "" },
+    paymentInfo: {
+      cardName: { type: String, default: "" },
+      cardNumber: { type: String, default: "" },
+      expiry: { type: String, default: "" },
+    },
   },
   { timestamps: true },
 );

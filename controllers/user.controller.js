@@ -92,4 +92,32 @@ userController.getUser = async (req, res) => {
   }
 };
 
+userController.updateUser = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { contact, address, addressLine2, city, state, zip, paymentInfo } =
+      req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        contact,
+        address,
+        addressLine2,
+        city,
+        state,
+        zip,
+        paymentInfo,
+      },
+      { new: true },
+    );
+
+    if (!user) throw new Error("User not found");
+
+    return res.status(200).json({ status: "success", user: user.toJSON() });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+};
+
 module.exports = userController;
